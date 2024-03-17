@@ -7,9 +7,9 @@ import pandas as pd
 from collections import Counter
 
 
-df_raw_dir = pd.read_excel("input_corpora")
-df_valence_dir = pd.read_excel('output_corpora/valence')
-df_arousal_dir = pd.read_excel('output_corpora/arousal')
+# df_raw_dir = pd.read_excel("input_corpora")
+# df_valence_dir = pd.read_excel('output_corpora/valence')
+# df_arousal_dir = pd.read_excel('output_corpora/arousal')
 
 
 df_raw = pd.read_excel("C:/Users/marta/OneDrive/Desktop/Dane/Clean corpora/Borderline/corpus_for_cleanup1.xlsx")
@@ -194,8 +194,8 @@ smoothed_x = np.concatenate((np.zeros(window_size - 1), smoothed_x))
 plt.plot(smoothed_x[window_size-1:], label=f'Smoothed Data with window size={window_size}', color='blue')
 plt.axhline(np.mean(main_analysis(df_valence, df_arousal)))
 plt.legend()
-#plt.show()
-plt.savefig('foo.png')
+plt.show()
+#plt.savefig('foo.png')
 
 
 
