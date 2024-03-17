@@ -17,12 +17,6 @@ a student of Cognitive Science at Osnabrueck University in the summer semester 2
 │   ├───data
 │   ├───output_model
 │   └───__pycache__
-├───input_corpora
-│   ├───borderline
-│   └───controls
-├───output_corpora
-│   ├───borderline
-│   └───controls
 ├───time_perception_analyses
 └───valence_prediction
     ├───data
