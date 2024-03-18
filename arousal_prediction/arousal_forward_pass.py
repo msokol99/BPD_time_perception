@@ -24,11 +24,16 @@ input_base_dir = 'input_corpora/borderline'
 base_model_dir = "sdadas/polish-roberta-base-v2"
 trained_model_dir = 'arousal_prediction/output_model/arousal_model.pth'
 
+# Hyperparameters for processing
 BATCH_SIZE = 16
 MAX_LEN = 256
+# Load the tokenizer from the pretrained model directory
 tokenizer = AutoTokenizer.from_pretrained(base_model_dir)
 tokenizer.pad_token = "<pad>"
 
+
+############### PREDICTION ####################
+# Load the trained model and set it to evaluation mode
 model_p = RobertaArousalClass()
 model_p.load_state_dict(torch.load(trained_model_dir, map_location=device))
 model_p.to(device)
@@ -69,4 +74,5 @@ for subdir, dirs, files in os.walk(input_base_dir):
         os.makedirs(output_subdir, exist_ok=True)
         output_file = os.path.join(output_base_dir, os.path.splitext(file)[0] + '_arousal.csv')
         output_df.to_csv(output_file, index=False, encoding='utf-8-sig')
+        
         print(f"Predictions written to {output_file}")
