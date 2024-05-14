@@ -5,12 +5,7 @@ import pandas as pd
 import numpy as np
 import pandas as pd
 from collections import Counter
-
-
-# df_raw_dir = pd.read_excel("input_corpora")
-# df_valence_dir = pd.read_excel('output_corpora/valence')
-# df_arousal_dir = pd.read_excel('output_corpora/arousal')
-
+import matplotlib.pyplot as plt
 
 df_raw = pd.read_excel("C:/Users/marta/OneDrive/Desktop/Dane/Clean corpora/Borderline/corpus_for_cleanup1.xlsx")
 df_valence = pd.read_excel('C:/Users/marta/OneDrive/Desktop/Dane/RoBERTa output/valence_output_file.xlsx')
@@ -166,10 +161,6 @@ def main_analysis(df_valence, df_arousal):
 
     return final_result
 
-
-
-import matplotlib.pyplot as plt
-
 def exponential_smoothing(x, window_size):
     weights = np.exp(np.linspace(-1, 0, window_size))
     weights /= weights.sum()
@@ -190,12 +181,46 @@ smoothed_x = exponential_smoothing(main_analysis(df_valence, df_arousal), window
 # Pad the beginning of smoothed_x with zeros to match the length of x
 smoothed_x = np.concatenate((np.zeros(window_size - 1), smoothed_x))
 
-#plt.plot(final_result, label='Gaussian smoothed data', color='black')
-plt.plot(smoothed_x[window_size-1:], label=f'Smoothed Data with window size={window_size}', color='blue')
-plt.axhline(np.mean(main_analysis(df_valence, df_arousal)))
-plt.legend()
+
+from matplotlib.patches import FancyArrowPatch
+
+# Define placeholder data
+x = range(0, len(smoothed_x[window_size-1:]))
+y = smoothed_x[window_size-1:]
+
+fig, ax = plt.subplots()
+
+y2 = main_analysis(df_valence, df_arousal)[window_size-1:]
+ax.plot(x, y2, label='Subjective time perception in computed effect sizes', color='gray')
+
+# Plot the mean line and legend
+ax.axhline(np.mean(y), color='red', linestyle='--', label='Mean')
+
+# Plot the data
+ax.plot(x, y, label='Subjective time perception in mean effect sizes', color='blue')
+
+# Define custom arrows
+arrow_up = FancyArrowPatch((0.94, 0.56), (0.94, 0.88), arrowstyle='-|>', color='black', mutation_scale=10)
+arrow_down = FancyArrowPatch((0.94, 0.53), (0.94, 0.11), arrowstyle='->', color='black', mutation_scale=10)
+
+# Add arrows to the axes
+fig.add_artist(arrow_up)
+fig.add_artist(arrow_down)
+
+
+ax.legend(fontsize=9)
+ax.set_title('Subjective time perception in BPD patients in a single corpus')
+ax.set_xlabel('Sentence index')
+ax.set_ylabel('Effect size (Hedges\' g)')
+ax.set_xticks(np.arange(0, len(x), step=100))
+
+# Add annotations for arrows
+fig.text(0.925, 0.57, 'Temporal underestimation', color='black', fontsize=8, ha='center', rotation='vertical')
+fig.text(0.925, 0.13, 'Temporal overestimation', color='black', fontsize=8, ha='center', rotation='vertical')
+
+plt.savefig('foo.png', transparent=True, dpi=600)
+
 plt.show()
-#plt.savefig('foo.png')
 
 
 

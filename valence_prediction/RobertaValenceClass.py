@@ -22,40 +22,49 @@ class RobertaValenceClass(nn.Module):
         """
         super(RobertaValenceClass, self).__init__()
 
-        # Load the model configuration specific to 'sdadas/polish-roberta-base-v2'
+        # Initialize the model configuration using a pre-trained RoBERTa model.
         self.model_config = RobertaConfig.from_pretrained('sdadas/polish-roberta-base-v2')
 
-        # Load the pre-trained RoBERTa model
+        # Load the pre-trained RoBERTa model with the initialized configuration.
         self.roberta = RobertaModel.from_pretrained('sdadas/polish-roberta-base-v2', config=self.model_config)
 
-        # Define a dropout layer to prevent overfitting with a dropout rate of 0.3
-        self.dropout = nn.Dropout(0.3)
-        # Linear layer to map the pooled output to three classes (adjust according to your task)
-        self.linear = nn.Linear(768, 3)
-        # ReLU activation function to introduce non-linearity
-        self.relu = nn.ReLU()
+        # Define network layers and dropout rates for regularization
+        self.dropout1 = nn.Dropout(0.5)  # First dropout layer with a 50% drop rate
+        self.linear1 = nn.Linear(768, 512)  # Linear layer reducing dimensionality to 512
+        self.relu1 = nn.ReLU()  # ReLU activation function
+        self.bn1 = nn.BatchNorm1d(512)  # Batch normalization for the output of the first linear layer
+
+        self.dropout2 = nn.Dropout(0.3)  # Second dropout layer with a 30% drop rate
+        self.linear2 = nn.Linear(512, 3)  # Linear layer reducing dimensionality to 3
+        self.relu2 = nn.ReLU()  # ReLU activation function for the second linear layer
+        self.bn2 = nn.BatchNorm1d(3)  # Batch normalization for the output of the second linear layer
 
     def forward(self, input_ids, attention_mask, token_type_ids):
         """
         Defines the forward pass of the model.
 
         Args:
-            input_ids (torch.Tensor): Input IDs for the RoBERTa model.
-            attention_mask (torch.Tensor): Attention mask to avoid attention on padding.
-            token_type_ids (torch.Tensor): Token type IDs to distinguish different sequences.
+            input_ids: Tensor of input IDs.
+            attention_mask: Tensor representing attention masks to avoid focusing on padding.
+            token_type_ids: Tensor of segment IDs to distinguish different types of tokens.
 
         Returns:
-            torch.Tensor: The output logits from the final linear layer.
+            The output of the neural network after processing the input through RoBERTa and additional layers.
         """
-        # Get the outputs from the RoBERTa model
+        # Obtain the outputs from the RoBERTa model.
         outputs = self.roberta(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        # Use the pooled output which is a summary of the content, as per RoBERTa's design
-        output = outputs.pooler_output
+        output = outputs.pooler_output  # Extract the pooled output features.
 
-        # Pass the output through the dropout and linear layers, and then apply the ReLU activation
-        out = self.dropout(output)
-        out = self.linear(out)
-        out = self.relu(out)
+        # Sequentially pass the output through the defined layers with activations and normalizations
+        out = self.dropout1(output)
+        out = self.linear1(out)
+        out = self.relu1(out)
+        out = self.bn1(out)
+
+        out = self.dropout2(out)
+        out = self.linear2(out)
+        out = self.relu2(out)
+        out = self.bn2(out)
 
         return out
 

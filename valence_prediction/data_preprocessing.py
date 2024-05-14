@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-train_data_dir = 'valence_prediction/data/train_data.csv'
-val_data_dir = 'valence_prediction/data/val_data.csv'
+train_data_dir = 'data/train_data.csv'
+val_data_dir = 'data/val_data.csv'
 
 # Load the ANPST 718 dataset (Imbir, 2016)
-df = pd.read_excel('C:/Users/marta/OneDrive/Desktop/Dane/Training Data/Annotated datasets/ANPST_718_Dataset.xlsx')
+df = pd.read_excel('C:/Users/marta/Desktop/Dane/Training Data/Annotated datasets/ANPST_718_Dataset.xlsx')
 
 # Load the annotated dataset
-df2 = pd.read_excel('C:/Users/marta/OneDrive/Desktop/Magisterka/Anotacje instrukcje itp/nonannotated_shuffled.xlsx')
+df2 = pd.read_csv('C:/Users/marta/Desktop/Magisterka/Anotacje instrukcje itp/bpd_training_dataset.csv')
 
 def preprocess_data(df, df2):
 
@@ -43,7 +43,7 @@ def preprocess_data(df, df2):
 
 
 # Train-Test-Validation Split
-train_df, val_df = train_test_split(preprocess_data(df), test_size=0.2, random_state=42)
+train_df, val_df = train_test_split(preprocess_data(df, df2), test_size=0.2, random_state=42)
 
 # Save the preprocessed data to CSV files
 train_df.to_csv(train_data_dir, encoding='utf-8-sig', index=False)

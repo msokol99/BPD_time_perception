@@ -2,13 +2,14 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-# Define paths for the training and validation data files
-train_data_dir = 'arousal_prediction/data/train_data.csv'
-val_data_dir = 'arousal_prediction/data/val_data.csv'
+train_data_dir = 'data/train_data.csv'
+val_data_dir = 'data/val_data.csv'
 
-# Load the datasets
-df = pd.read_excel('C:/Users/marta/OneDrive/Desktop/Dane/Training Data/Annotated datasets/ANPST_718_Dataset.xlsx')
-df2 = pd.read_excel('C:/Users/marta/OneDrive/Desktop/Magisterka/Anotacje instrukcje itp/nonannotated_shuffled.xlsx')
+# Load the ANPST 718 dataset (Imbir, 2016)
+df = pd.read_excel('C:/Users/marta/Desktop/Dane/Training Data/Annotated datasets/ANPST_718_Dataset.xlsx')
+
+# Load the annotated dataset
+df2 = pd.read_csv('C:/Users/marta/Desktop/Magisterka/Anotacje instrukcje itp/bpd_training_dataset.csv')
 
 def preprocess_data(df, df2):
     """

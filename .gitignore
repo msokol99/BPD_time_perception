@@ -161,6 +161,7 @@ cython_debug/
 
 input_corpora/
 output_corpora/
+roberta_base_transformers/
 
 arousal_prediction/data/
 arousal_prediction/output_model/

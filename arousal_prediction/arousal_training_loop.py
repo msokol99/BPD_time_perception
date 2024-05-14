@@ -9,7 +9,7 @@ import logging
 from SentimentDataClass import SentimentData
 from RobertaArousalClass import RobertaArousalClass
 import torch_directml
-
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 ############# SPECIFICATIONS ###############
 logging.basicConfig(level=logging.ERROR)
@@ -69,10 +69,13 @@ scheduler = get_linear_schedule_with_warmup(optimizer,
                                             num_warmup_steps=int((len(training_loader) * EPOCHS)*0.05),
                                             num_training_steps=len(training_loader) * EPOCHS)
 
-
 ######################### TRAINING ######################################
 def train(optimizer, scheduler, epochs, training_loader, validation_loader):
     best_accuracy = 0
+    best_val_loss = float('inf')  # Initialize best validation loss to infinity
+    epochs_no_improve = 0  # Counter for epochs without improvement
+    patience = 3  # Set your patience (number of epochs to wait after last improvement)
+    counter = 0
 
     model.train()
 
@@ -86,7 +89,7 @@ def train(optimizer, scheduler, epochs, training_loader, validation_loader):
             mask = data['mask'].to(device, dtype=torch.long)
             token_type_ids = data['token_type_ids'].to(device, dtype=torch.long)
 
-            targets = data['targets'].to(device, dtype=torch.long)  # Change to long for classification
+            targets = data['targets'].to(device, dtype=torch.long)
 
             outputs = model(ids, mask, token_type_ids)
 
@@ -131,15 +134,23 @@ def train(optimizer, scheduler, epochs, training_loader, validation_loader):
                 total_samples_val += targets_val.size(0)
 
         accuracy_val = correct_predictions_val / total_samples_val
+        val_loss = total_loss_val / len(validation_loader)
+        train_loss = total_loss_train / len(training_loader)
 
-        if best_accuracy < accuracy_val:
-            best_accuracy = accuracy_val
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
             torch.save(model.state_dict(), save_dir)
-            print(f'Saved model for epoch {epoch_num + 1}')
+            print(f'Saved model with improved validation loss at epoch {epoch_num + 1}')
 
         print(
             f'Summary of epoch {epoch_num + 1} | Train Loss: {total_loss_train / len(training_loader): .10f} '
-            f'| Train Accuracy: {accuracy_train: .4f} | Validation Loss: {total_loss_val / len(validation_loader): .10f} | Validation Accuracy: {accuracy_val: .4f}')
+            f'| Train Accuracy: {accuracy_train: .4f} | Validation Loss: {val_loss: .10f} | Validation Accuracy: {accuracy_val: .4f}')
+        
+        if (val_loss - train_loss) > 0.1:
+            counter +=1
+            if counter >= 2:
+                print("Early stopping to prevent overfitting")
+                break
 
         scheduler.step()
 
