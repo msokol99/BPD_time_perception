@@ -14,8 +14,7 @@ class RobertaArousalClass(nn.Module):
         bn1: Batch normalization for the first transformed output.
         dropout2: Another dropout layer to reduce overfitting in the subsequent set of layers.
         linear2: A second linear layer to further transform the data.
-        relu2: A ReLU activation function following the second linear transformation.
-        bn2: Batch normalization for the second transformed output.
+        softmax: A softmax activation function following the second linear transformation.
     """
     
     def __init__(self):
@@ -38,8 +37,7 @@ class RobertaArousalClass(nn.Module):
 
         self.dropout2 = nn.Dropout(0.3)  # Second dropout layer with a 30% drop rate
         self.linear2 = nn.Linear(512, 3)  # Linear layer reducing dimensionality to 3
-        self.relu2 = nn.ReLU()  # ReLU activation function for the second linear layer
-        self.bn2 = nn.BatchNorm1d(3)  # Batch normalization for the output of the second linear layer
+        self.softmax = nn.Softmax(dim=1)  # Softmax activation function for the second linear layer
 
     def forward(self, input_ids, attention_mask, token_type_ids):
         """
@@ -65,7 +63,6 @@ class RobertaArousalClass(nn.Module):
 
         out = self.dropout2(out)
         out = self.linear2(out)
-        out = self.relu2(out)
-        out = self.bn2(out)
+        out = self.softmax(out)  # Apply softmax to get probabilities for each class
 
         return out

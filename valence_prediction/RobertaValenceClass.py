@@ -11,9 +11,12 @@ class RobertaValenceClass(nn.Module):
     Attributes:
         model_config (RobertaConfig): Configuration settings for the RoBERTa model.
         roberta (RobertaModel): The pre-trained RoBERTa model.
-        dropout (nn.Dropout): Dropout layer to reduce overfitting.
-        linear (nn.Linear): Linear layer to map hidden states to output classes.
-        relu (nn.ReLU): ReLU activation function.
+        dropout1 (nn.Dropout): First dropout layer to reduce overfitting.
+        linear1 (nn.Linear): First linear layer to map hidden states to an intermediate representation.
+        relu1 (nn.ReLU): ReLU activation function after the first linear layer.
+        bn1 (nn.BatchNorm1d): Batch normalization after the first linear layer.
+        dropout2 (nn.Dropout): Second dropout layer to reduce overfitting.
+        linear2 (nn.Linear): Second linear layer to map intermediate representation to output classes.
     """
 
     def __init__(self):
@@ -36,8 +39,7 @@ class RobertaValenceClass(nn.Module):
 
         self.dropout2 = nn.Dropout(0.3)  # Second dropout layer with a 30% drop rate
         self.linear2 = nn.Linear(512, 3)  # Linear layer reducing dimensionality to 3
-        self.relu2 = nn.ReLU()  # ReLU activation function for the second linear layer
-        self.bn2 = nn.BatchNorm1d(3)  # Batch normalization for the output of the second linear layer
+        self.softmax = nn.Softmax(dim=1)  # Softmax activation function for the second linear layer
 
     def forward(self, input_ids, attention_mask, token_type_ids):
         """
@@ -63,8 +65,6 @@ class RobertaValenceClass(nn.Module):
 
         out = self.dropout2(out)
         out = self.linear2(out)
-        out = self.relu2(out)
-        out = self.bn2(out)
+        out = self.softmax(out)  # Apply softmax to get probabilities for each class
 
         return out
-

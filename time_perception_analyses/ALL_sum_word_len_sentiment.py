@@ -56,7 +56,7 @@ def process_data(df_valence, df_arousal):
     for idx, row in df.iterrows():
         valence_step = row['valence']
         arousal_step = row['arousal']
-        combined = -0.099 if valence_step == 2 and arousal_step == 2 else (-0.202 if valence_step == 0 and arousal_step in [0, 2] else (0.022 if valence_step == 2 and arousal_step == 0 else 0))
+        combined = -0.011 if valence_step == 2 and arousal_step == 2 else (-0.110 if valence_step == 0 and arousal_step == 2 else (0.022 if valence_step == 2 and arousal_step == 0 else (-0.035 if valence_step == 0 and arousal_step == 0 else 0)))
         df.at[idx, 'combined'] = combined
 
     return df['combined']
@@ -74,24 +74,11 @@ def exponential_smoothing(x, window_size):
     weights /= weights.sum()
     return np.convolve(x, weights, mode='valid')
 
-# # Plotting function
-# def plot_data(smoothed_x, raw_data):
-#     x = range(len(smoothed_x))
-#     fig, ax = plt.subplots()
-#     y2 = raw_data[len(raw_data) - len(smoothed_x):]
-#     ax.plot(x, y2, label='Subjective time perception in computed effect sizes', color='gray')
-#     ax.axhline(np.mean(smoothed_x), color='red', linestyle='--', label='Mean')
-#     ax.plot(x, smoothed_x, label='Subjective time perception in mean effect sizes', color='blue')
-#     ax.legend(fontsize=9)
-#     ax.set_title('Subjective time perception in BPD patients in a single corpus')
-#     ax.set_xlabel('Sentence index')
-#     ax.set_ylabel('Effect size (Hedges\' g)')
-#     #plt.show()
 
 # Main loop to process files
-num_files = 8
+num_files = 5
 base_paths = {
-    "raw": "input_corpora/controls/",
+    "raw": "input_corpora/borderline/",
     "valence": "valence_prediction/output_corpora/",
     "arousal": "arousal_prediction/output_corpora/"
 }
@@ -99,9 +86,9 @@ base_paths = {
 output_df = pd.DataFrame()
 
 for i in range(1, num_files + 1):
-    df_raw = pd.read_excel(os.path.join(base_paths['raw'], f"control_input{i}.xlsx"))
-    df_valence = pd.read_csv(os.path.join(base_paths['valence'], f"control_input{i}_valence.csv"))
-    df_arousal = pd.read_csv(os.path.join(base_paths['arousal'], f"control_input{i}_arousal.csv"))
+    df_raw = pd.read_excel(os.path.join(base_paths['raw'], f"bpd_input{i}.xlsx"))
+    df_valence = pd.read_csv(os.path.join(base_paths['valence'], f"bpd_input{i}_valence.csv"))
+    df_arousal = pd.read_csv(os.path.join(base_paths['arousal'], f"bpd_input{i}_arousal.csv"))
     
     final_result = main_analysis(df_raw, df_valence, df_arousal)
     smoothed_result = exponential_smoothing(final_result, window_size=40)
@@ -111,4 +98,4 @@ for i in range(1, num_files + 1):
 
 print(output_df)
 
-output_df.to_excel("control_time_output.xlsx", index=False)
+output_df.to_excel("bpd_time_output.xlsx", index=False)

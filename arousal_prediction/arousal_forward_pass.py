@@ -19,7 +19,7 @@ device = torch_directml.device()
 
 ############### SETTINGS ####################
 output_base_dir = 'arousal_prediction/output_corpora'
-input_base_dir = 'input_corpora/borderline'
+input_base_dir = 'input_corpora/controls'
 
 base_model_dir = "sdadas/polish-roberta-base-v2"
 trained_model_dir = 'arousal_prediction/output_model/arousal_model.pth'
